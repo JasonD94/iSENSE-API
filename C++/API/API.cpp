@@ -703,6 +703,7 @@ std::string iSENSE::get_dataset_ID(std::string dataset_name) {
     // Grab the dataset ID and save it in a string
     std::string dataset_ID = obj["id"].to_str();
 
+
     // Grab the dataset name
     std::string name = obj["name"].get<std::string>();
 
@@ -721,41 +722,7 @@ std::string iSENSE::get_dataset_ID(std::string dataset_name) {
 
 // Call this function to POST data to rSENSE
 bool iSENSE::post_json_key() {
-  /*  These first couple of if statements perform some basic error checking,
-   *  such as whether or not all the required fields have been set up.
-   */
-
-  // Check that the project ID is set properly.
-  // When the ID is set, the fields are also pulled down as well.
-  if (project_ID == EMPTY || project_ID.empty()) {
-    std::cerr << "\nError in method: post_json_key()\n";
-    std::cerr << "Please set a project ID!\n";
-    return false;
-  }
-
-  // Check that a title and contributor key has been set.
-  if (title == EMPTY || title.empty()) {
-    std::cerr << "\nError in method: post_json_key()\n";
-    std::cerr << "\nPlease set a project title!\n";
-    return false;
-  }
-
-  if (contributor_key == EMPTY || contributor_key.empty()) {
-    std::cerr << "\nError in method: post_json_key()\n";
-    std::cerr << "\nPlease set a contributor key!\n";
-    return false;
-  }
-
-  // If a label wasn't set, automatically set it to "cURL"
-  if (contributor_label == "label" || contributor_label.empty()) {
-    contributor_label = "cURL";
-  }
-
-  // Make sure the map actually has stuff pushed to it.
-  if (map_data.empty()) {
-    std::cerr << "\nError in method: post_json_key()\n";
-    std::cerr << "Map of keys/data is empty.\n";
-    std::cerr << "Please push some data back to this object.\n";
+  if(!empty_project_check(POST_KEY, "post_json_key")) {
     return false;
   }
 
@@ -785,33 +752,8 @@ bool iSENSE::post_json_key() {
     return true;
   }
 
-  std::cerr << "\n\nError in method: post_json_key()\n";
-  std::cerr << "POST request **failed**\n";
-  std::cerr << "HTTP Response Code was: " << http_code;
-
-  // Make a function for this!
-  if (http_code == HTTP_UNAUTHORIZED) {
-    std::cerr << "Try checking to make sure your contributor key is valid\n";
-    std::cerr << "for the project you are trying to contribute to.\n";
-  }
-  if (http_code == HTTP_NOT_FOUND) {
-    std::cerr << "Unable to find that project ID.\n";
-  }
-  if (http_code == HTTP_UNPROC_ENTRY) {
-    std::cerr << "Something went wrong with iSENSE.\n";
-    std::cerr << "Try formatting your data differently, using a contributor \n";
-    std::cerr << "key instead of an email, or asking for help from others. \n";
-    std::cerr << "You can also try running the the program with the debug \n";
-    std::cerr << "method enabled, by typing: object_name.debug()\n";
-    std::cerr << "This will output a ton of data to the console and \n";
-    std::cerr << "may help you in debugging your program.\n";
-  }
-  if (http_code == CURL_ERROR) {
-    std::cerr << "Curl failed for some unknown reason.\n";
-    std::cerr << "Make sure you've installed curl / libcurl, and have the \n";
-    std::cerr << "picojson header file as well.\n";
-  }
-
+  // Quickly find the error message for the given http_code.
+  check_http_code(http_code, "post_json_key()");
   return false;
 }
 
@@ -822,29 +764,7 @@ bool iSENSE::post_json_key() {
  *  In the future, uploading JSON will return the dataset ID for this function
  */
 bool iSENSE::append_key_byID(std::string dataset_ID) {
-  if (project_ID == EMPTY || project_ID.empty()) {
-    std::cerr << "\nError in method: append_key_byID()\n";
-    std::cerr << "Please set a project ID!\n";
-    return false;
-  }
-  if (title == EMPTY || title.empty()) {
-    std::cerr << "\nError in method: append_key_byID()\n";
-    std::cerr << "Please set a project title!\n";
-    return false;
-  }
-  if (contributor_key == EMPTY || contributor_key.empty()) {
-    std::cerr << "\nError in method: append_key_byID()\n";
-    std::cerr << "Please set a contributor key!\n";
-    return false;
-  }
-  if (contributor_label == "label" || contributor_label.empty()) {
-    // If a label wasn't set, automatically set it to "cURL"
-    contributor_label = "cURL";
-  }
-  if (map_data.empty()) {
-    std::cerr << "\nError in method: append_key_byID()\n";
-    std::cerr << "Map of keys/data is empty.\n";
-    std::cerr << "You should push some data back to this object.\n";
+  if(!empty_project_check(APPEND_KEY, "append_key_byID")) {
     return false;
   }
 
@@ -875,33 +795,8 @@ bool iSENSE::append_key_byID(std::string dataset_ID) {
     return true;
   }
 
-  std::cerr << "\n\nError in method: append_key_byID()\n";
-  std::cerr << "POST request **failed**\n";
-  std::cerr << "HTTP Response Code was: " << http_code << "\n";
-
-  // Make a function for this!
-  if (http_code == HTTP_UNAUTHORIZED) {
-    std::cerr << "Try checking to make sure your contributor key is valid\n";
-    std::cerr << "for the project you are trying to contribute to.\n";
-  }
-  if (http_code == HTTP_NOT_FOUND) {
-    std::cerr << "Unable to find that project ID.\n";
-  }
-  if (http_code == HTTP_UNPROC_ENTRY) {
-    std::cerr << "Something went wrong with iSENSE.\n";
-    std::cerr << "Try formatting your data differently, using a contributor \n";
-    std::cerr << "key instead of an email, or asking for help from others. \n";
-    std::cerr << "You can also try running the the program with the debug \n";
-    std::cerr << "method enabled, by typing: object_name.debug()\n";
-    std::cerr << "This will output a ton of data to the console and \n";
-    std::cerr << "may help you in debugging your program.\n";
-  }
-  if (http_code == CURL_ERROR) {
-    std::cerr << "Curl failed for some unknown reason.\n";
-    std::cerr << "Make sure you've installed curl / libcurl, and have the \n";
-    std::cerr << "picojson header file as well.\n";
-  }
-
+  // Quickly find the error message for the given http_code.
+  check_http_code(http_code, "append_key_byID()");
   return false;
 }
 
@@ -914,29 +809,7 @@ bool iSENSE::append_key_byID(std::string dataset_ID) {
  *
  */
 bool iSENSE::append_key_byName(std::string dataset_name) {
-  if (project_ID == EMPTY || project_ID.empty()) {
-    std::cerr << "\nError in method: append_key_byName()\n";
-    std::cerr << "Please set a project ID!\n";
-    return false;
-  }
-  if (title == EMPTY || title.empty()) {
-    std::cerr << "\nError in method: append_key_byName()\n";
-    std::cerr << "Please set a project title!\n";
-    return false;
-  }
-  if (contributor_key == EMPTY || contributor_key.empty()) {
-    std::cerr << "\nError in method: append_key_byName()\n";
-    std::cerr << "Please set a contributor key!\n";
-    return false;
-  }
-  if (contributor_label == "label" || contributor_label.empty()) {
-    // If a label wasn't set, automatically set it to "cURL"
-    contributor_label = "cURL";
-  }
-  if (map_data.empty()) {
-    std::cerr << "\nError in method: append_key_byName()\n";
-    std::cerr << "Map of keys/data is empty.\n";
-    std::cerr << "You should push some data back to this object.\n";
+  if(!empty_project_check(APPEND_KEY, "append_key_byName")) {
     return false;
   }
 
@@ -963,34 +836,7 @@ bool iSENSE::append_key_byName(std::string dataset_name) {
 
 // Post using a email / password
 bool iSENSE::post_json_email() {
-  if (project_ID == EMPTY || project_ID.empty()) {
-    std::cerr << "\nError in method: post_json_email()\n";
-    std::cerr << "Please set a project ID!\n";
-    return false;
-  }
-  if (title == EMPTY || title.empty()) {
-    std::cerr << "\nError in method: post_json_email()\n";
-    std::cerr << "Please set a project title!\n";
-    return false;
-  }
-  if (email == EMPTY || email.empty()) {
-    std::cerr << "\nError in method: post_json_email()\n";
-    std::cerr << "Please set an email address!\n";
-    return false;
-  }
-  if (password == EMPTY || password.empty()) {
-    std::cerr << "\nError in method: post_json_email()\n";
-    std::cerr << "Please set a password!\n";
-    return false;
-  }
-  if (contributor_label == "label" || contributor_label.empty()) {
-    // If a label wasn't set, automatically set it to "cURL"
-    contributor_label = "cURL";
-  }
-  if (map_data.empty()) {
-    std::cerr << "\nError in method: post_json_email()\n";
-    std::cerr << "Map of keys/data is empty.\n";
-    std::cerr << "You should push some data back to this object.\n";
+  if(!empty_project_check(POST_EMAIL, "post_json_email")) {
     return false;
   }
 
@@ -1017,63 +863,16 @@ bool iSENSE::post_json_email() {
     std::cout << "/projects/" << project_ID << "\n";
     return true;
   }
-  std::cerr << "\n\nError in method: post_json_email()\n";
-  std::cerr << "POST request **failed**\n";
-  std::cerr << "HTTP Response Code was: " << http_code << "\n";
 
-  // Make a function for this!
-  if (http_code == HTTP_UNAUTHORIZED) {
-    std::cerr << "Try checking to make sure your contributor key is valid\n";
-    std::cerr << "for the project you are trying to contribute to.\n";
-  }
-  if (http_code == HTTP_NOT_FOUND) {
-    std::cerr << "Unable to find that project ID.\n";
-  }
-  if (http_code == HTTP_UNPROC_ENTRY) {
-    std::cerr << "Something went wrong with iSENSE.\n";
-    std::cerr << "Try formatting your data differently, using a contributor \n";
-    std::cerr << "key instead of an email, or asking for help from others. \n";
-    std::cerr << "You can also try running the the program with the debug \n";
-    std::cerr << "method enabled, by typing: object_name.debug()\n";
-    std::cerr << "This will output a ton of data to the console and \n";
-    std::cerr << "may help you in debugging your program.\n";
-  }
-  if (http_code == CURL_ERROR) {
-    std::cerr << "Curl failed for some unknown reason.\n";
-    std::cerr << "Make sure you've installed curl / libcurl, and have the \n";
-    std::cerr << "picojson header file as well.\n";
-  }
-
+  // Quickly find the error message for the given http_code.
+  check_http_code(http_code, "post_json_email()");
   return false;
 }
 
 
 // Post append using email and password
 bool iSENSE::append_email_byID(std::string dataset_ID) {
-  if (project_ID == EMPTY || project_ID.empty()) {
-    std::cerr << "\nError in method: append_email_byID\n";
-    std::cerr << "Please set a project ID!\n";
-    return false;
-  }
-  if (title == EMPTY || title.empty()) {
-    std::cerr << "\nError in method: append_email_byID\n";
-    std::cerr << "Please set a project title!\n";
-    return false;
-  }
-  if (email == EMPTY || email.empty()) {
-    std::cerr << "\nError in method: append_email_byID\n";
-    std::cerr << "Please set an email address!\n";
-    return false;
-  }
-  if (password == EMPTY || password.empty()) {
-    std::cerr << "\nError in method: append_email_byID\n";
-    std::cerr << "Please set a password!\n";
-    return false;
-  }
-  if (map_data.empty()) {
-    std::cerr << "\nError in method: append_email_byID\n";
-    std::cerr << "Map of keys/data is empty.\n";
-    std::cerr << "You should push some data back to this object.\n";
+  if(!empty_project_check(APPEND_EMAIL, "append_email_byID")) {
     return false;
   }
 
@@ -1101,33 +900,8 @@ bool iSENSE::append_email_byID(std::string dataset_ID) {
     return true;
   }
 
-  std::cerr << "\nError in method: append_email_byID()\n";
-  std::cerr << "POST request **failed**\n";
-  std::cerr << "HTTP Response Code was: " << http_code << "\n";
-
-  // Make a function for this!
-  if (http_code == HTTP_UNAUTHORIZED) {
-    std::cerr << "Try checking to make sure your contributor key is valid\n";
-    std::cerr << "for the project you are trying to contribute to.\n";
-  }
-  if (http_code == HTTP_NOT_FOUND) {
-    std::cerr << "Unable to find that project ID.\n";
-  }
-  if (http_code == HTTP_UNPROC_ENTRY) {
-    std::cerr << "Something went wrong with iSENSE.\n";
-    std::cerr << "Try formatting your data differently, using a contributor \n";
-    std::cerr << "key instead of an email, or asking for help from others. \n";
-    std::cerr << "You can also try running the the program with the debug \n";
-    std::cerr << "method enabled, by typing: object_name.debug()\n";
-    std::cerr << "This will output a ton of data to the console and \n";
-    std::cerr << "may help you in debugging your program.\n";
-  }
-  if (http_code == CURL_ERROR) {
-    std::cerr << "Curl failed for some unknown reason.\n";
-    std::cerr << "Make sure you've installed curl / libcurl, and have the \n";
-    std::cerr << "picojson header file as well.\n";
-  }
-
+  // Quickly find the error message for the given http_code.
+  check_http_code(http_code, "append_email_byID()");
   return false;
 }
 
@@ -1137,30 +911,7 @@ bool iSENSE::append_email_byID(std::string dataset_ID) {
  *  a given project until we find the dataset with the given name.
  */
 bool iSENSE::append_email_byName(std::string dataset_name) {
-  if (project_ID == EMPTY || project_ID.empty()) {
-    std::cerr << "\nError in method: append_email_byName\n";
-    std::cerr << "Please set a project ID!\n";
-    return false;
-  }
-  if (title == EMPTY || title.empty()) {
-    std::cerr << "\nError in method: append_email_byName\n";
-    std::cerr << "Please set a project title!\n";
-    return false;
-  }
-  if (email == EMPTY || email.empty()) {
-    std::cerr << "\nError in method: append_email_byName\n";
-    std::cerr << "Please set an email address!\n";
-    return false;
-  }
-  if (password == EMPTY || password.empty()) {
-    std::cerr << "\nError in method: append_email_byName\n";
-    std::cerr << "Please set a password!\n";
-    return false;
-  }
-  if (map_data.empty()) {
-    std::cerr << "\nError in method: append_email_byName\n";
-    std::cerr << "Map of keys/data is empty.\n";
-    std::cerr << "You should push some data back to this object.\n";
+  if(!empty_project_check(APPEND_EMAIL,"append_email_byName")) {
     return false;
   }
 
@@ -1260,6 +1011,7 @@ void iSENSE::format_upload_string(int post_type) {
 // since I reuse this code for all 5 types of data.
 void iSENSE::format_data(std::vector<std::string> *vect,
                          array::iterator it, std::string field_ID) {
+
   std::vector<std::string>::iterator x;
 
   // picojson::value::array, basically a vector but represents a json array.
@@ -1339,6 +1091,12 @@ int iSENSE::post_data_function(int post_type) {
     // Verbose debug output - turn this on if you are having problems.
     // It will spit out a ton of information, such as bytes sent off,
     // headers/access/etc. Useful to see if you formatted the data right.
+
+    // *****************
+    // Should make a function to turn this off or on
+    // or a variable! (bool)
+    // *****************
+
     // curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
     std::cout << "\nrSENSE response: \n";
@@ -1359,6 +1117,94 @@ int iSENSE::post_data_function(int post_type) {
 
   // If curl fails for some reason, return CURL_ERROR (-1).
   return CURL_ERROR;
+}
+
+
+// Checks to see if the given project has been properly setup.
+// Shouldn't be any empty values, such as project ID, contributor key, etc.
+bool iSENSE::empty_project_check(int type, std::string method) {
+  // Check email based values, such as email & password.
+  if (type == POST_EMAIL || type == APPEND_EMAIL) {
+    if (email == EMPTY || email.empty()) {
+      std::cerr << "\nError in method: " << method << "\n";
+      std::cerr << "Please set an email address!\n";
+      return false;
+    }
+    if (password == EMPTY || password.empty()) {
+      std::cerr << "\nError in method: " << method << "\n";
+      std::cerr << "Please set a password!\n";
+      return false;
+    }
+  }
+
+  // Check key based values, such as contributor key and label.
+  if (type == POST_KEY || type == APPEND_KEY) {
+    if (contributor_key == EMPTY || contributor_key.empty()) {
+      std::cerr << "\nError in method: " << method << "\n";
+      std::cerr << "Please set a contributor key!\n";
+      return false;
+    }
+    if (contributor_label == "label" || contributor_label.empty()) {
+      // If a label wasn't set, automatically set it to "cURL"
+      contributor_label = "cURL";
+    }
+  }
+
+  // The rest are general checks that should not be empty, since the calling
+  // method depends on them being set properly.
+  if (project_ID == EMPTY || project_ID.empty()) {
+    std::cerr << "\nError in method: " << method << "\n";
+    std::cerr << "Please set a project ID!\n";
+    return false;
+  }
+  if (title == EMPTY || title.empty()) {
+    std::cerr << "\nError in method: " << method << "\n";
+    std::cerr << "Please set a project title!\n";
+    return false;
+  }
+
+  if (map_data.empty()) {
+    std::cerr << "\nError in method: " << method << "\n";
+    std::cerr << "Map of keys/data is empty.\n";
+    std::cerr << "You should push some data back to this object.\n";
+    return false;
+  }
+
+  // If we don't trigger any of the above if statements, then this project is
+  // not empty, so return true.
+  return true;
+}
+
+
+// Checks a given HTTP code for errors.
+bool iSENSE::check_http_code(int http_code, std::string method) {
+  std::cerr << "\nError in method: " << method << "\n";
+  std::cerr << "POST request **failed**\n";
+  std::cerr << "HTTP Response Code was: " << http_code << "\n";
+
+  if (http_code == 401) {
+    std::cerr << "Try checking to make sure your contributor key is valid\n";
+    std::cerr << "for the project you are trying to contribute to.\n";
+  }
+  if (http_code == 404) {
+    std::cerr << "Unable to find that project ID.\n";
+  }
+  if (http_code == 422) {
+    std::cerr << "Something went wrong with iSENSE.\n";
+    std::cerr << "Try formatting your data differently, using a contributor \n";
+    std::cerr << "key instead of an email, or asking for help from others. \n";
+    std::cerr << "You can also try running the the program with the debug \n";
+    std::cerr << "method enabled, by typing: object_name.debug()\n";
+    std::cerr << "This will output a ton of data to the console and \n";
+    std::cerr << "may help you in debugging your program.\n";
+  }
+  if (http_code == CURL_ERROR) {
+    std::cerr << "Curl failed for some unknown reason.\n";
+    std::cerr << "Make sure you've installed curl / libcurl, and have the \n";
+    std::cerr << "picojson header file as well.\n";
+  }
+
+  return true;
 }
 
 

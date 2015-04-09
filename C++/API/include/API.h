@@ -20,8 +20,8 @@
 
 /*  Currently working on:
  *  Linux (64 bit) -> Uses a Makefile
- *  Mac OS 10.10 (64 bit) -> should work the same as Linux
- *  Windows 7 / 8.1 (64 bit) -> Requires Visual Studios
+ *  Mac OS 10.10 (64 bit) -> should work similar to Linux
+ *  Windows 7 / 8.1 (64 bit) -> Requires Visual Studios, see README
  */
 
 /* NOTE:
@@ -45,6 +45,7 @@ const int POST_KEY = 1;
 const int APPEND_KEY = 2;
 const int POST_EMAIL = 3;
 const int APPEND_EMAIL = 4;
+const int URL_CHECK = 5;
 
 // HTTP Error codes
 const int HTTP_AUTHORIZED = 200;
@@ -64,12 +65,17 @@ public:
   iSENSE(std::string proj_ID, std::string proj_title,
          std::string label, std::string contr_key);
 
-
   // Similar to the constructor with parameters, but called after
   // the object is created. This way you can change the title/project ID/etc.
   void set_project_all(std::string proj_ID, std::string proj_title,
                        std::string label, std::string contr_key);
 
+  void set_project_ID(std::string proj_ID);
+  void set_project_title(std::string proj_title);
+  void set_contributor_key(std::string proj_key);
+
+  // Optional, by default the label will be "cURL"
+  void set_project_label(std::string proj_label);
   void set_project_ID(std::string proj_ID);
   void set_project_title(std::string proj_title);
   void set_contributor_key(std::string proj_key);
@@ -109,7 +115,8 @@ public:
   void format_upload_string(int post_type);
 
   // This formats one FIELD ID : DATA pair
-  void format_data(std::vector<std::string> *vect, array::iterator it, std::string field_ID);
+  void format_data(std::vector<std::string> *vect,
+                   array::iterator it, std::string field_ID);
 
   // This function makes a POST request via libcurl
   int post_data_function(int post_type);
@@ -126,7 +133,8 @@ public:
   std::vector<std::string> get_projects_search(std::string search_term);
 
   // Return a vector of data given a field name
-  std::vector<std::string> get_dataset(std::string dataset_name, std::string field_name);
+  std::vector<std::string> get_dataset(std::string dataset_name,
+                                       std::string field_name);
 
   // Future: return a map of media objects
   // map<std::string, vector<std::string> > get_media_objects();
@@ -136,37 +144,33 @@ public:
 
   /*  Notes about the append & edit functions
    *
-   *  Appending & editing by key is tricky.
-   *  In general, you should only be able to append or edit a dataset that you
-   *  uploaded with your contributor key.
-   *
-   *  You cannot append to just any project with email & password.
-   *  It DOES not work like uploading a dataset - you will only be able to
-   *  append to datasets you own (projects you've created while logged in).
-   *
-   *  To sum up:
-   *  A Contributor key can append to datasets that YOUR KEY uploaded.
-   *  Email & password can append to datasets YOU uploaded
-   *  OR any datasets in projects YOU created.
+   *  A Contributor key can append or edit to datasets that YOUR KEY uploaded.
+   *  Email & password can append or edit to datasets YOU uploaded OR any
+   *  datasets in projects YOU created.
    *
    *  NOTE: You do not need call
    *  bool get_datasets_and_mediaobjects();
    *  before using any of the editing and appending methods.
    *  All append methods automatically call this function.
-   *
-   *  Note - the edit functions are not yet complete.
    */
 
   // Appends to a dataset using a dataset name and a key or email/password
   bool append_key_byName(std::string dataset_name);
   bool append_email_byName(std::string dataset_name);
 
-  // Helper methods
+  // Helper methods - converts names to iSENSE IDs
   std::string get_dataset_ID(std::string dataset_name);
   std::string get_field_ID(std::string field_name);
 
+  // Error methods - makes error checking simple.
+  bool empty_project_check(int type, std::string method);
+  bool check_http_code(int http_code, std::string method);
+
+  // For debugging, this method dumps all the data.
+  void debug();
+
 /*  Future functions to be implemented at a later date.
-      //  Editing API calls (not yet implemented)
+      //  Editing API calls
       bool get_edit_key();      // Edit a dataset with a contributor key
       bool get_edit_user();     // Edit a dataset with a email / password
 
@@ -179,12 +183,7 @@ public:
       void post_projects_email(); // Post a project by email / password
 */
 
-  // For debugging, this method dumps all the data.
-  void debug();
-
-
 protected:
-
   /*  Users do not need to worry about dataset IDs. They only need to pass the
    *  append function a valid dataset name - the name as it appears on iSENSE.
    *  This method is marked as protected to prevent users from accessing it.
@@ -194,7 +193,6 @@ protected:
   bool append_email_byID(std::string dataset_ID);
 
 private:
-
   /*  These two picojson objects will be used to upload to iSENSE.
    *  The upload_data object contains the entire upload string, in JSON format.
    *  Picojson can output this to a string and then we can pass that string
@@ -213,11 +211,12 @@ private:
    *  fields_array has that same data in an array form for iterating through it.
    */
   value get_data, fields;
+
+  // Contains the project's fields, all project datasets and media objects.
   array fields_array, data_sets, media_objects;
 
-  /*  Data to be uploaded to iSENSE. The string is the field name,
-   *  the vector of strings contains all the data for that field name.
-   */
+  // Data to be uploaded to iSENSE. The string is the field name,
+  // the vector of strings contains all the data for that field name.
   std::map<std::string, std::vector<std::string> > map_data;
 
   // Data needed for processing the upload request
