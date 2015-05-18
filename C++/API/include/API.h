@@ -57,7 +57,7 @@ const int CURL_ERROR = -1;
 
 // Error checking constants
 const std::string GET_ERROR = "ERROR";
-const std::string EMPTY = "-----";
+const std::string EMPTY = "54545445454545";
 
 class iSENSE {
 public:
@@ -70,18 +70,13 @@ public:
   void set_project_all(std::string proj_ID, std::string proj_title,
                        std::string label, std::string contr_key);
 
-  void set_project_ID(std::string proj_ID);
-  void set_project_title(std::string proj_title);
-  void set_contributor_key(std::string proj_key);
-
-  // Optional, by default the label will be "cURL"
+  // These can be used to manually set data.
+  // You MUST do this for email / password uploading / appending.
+  // Or you should use the above contructor with a random contributor key.
   void set_project_label(std::string proj_label);
   void set_project_ID(std::string proj_ID);
   void set_project_title(std::string proj_title);
   void set_contributor_key(std::string proj_key);
-
-  // Optional, by default the label will be "cURL"
-  void set_project_label(std::string proj_label);
 
   // This should be used for setting the email / password for a project.
   // Returns true if the email / password are valid, or false if they are not.

@@ -31,6 +31,13 @@ using namespace picojson;
  *
  */
 
+const std::string PROJ_ID = "1006";
+const std::string TITLE = "TITLE";
+const std::string LABEL = "Boost";
+const std::string KEY = "123";
+
+const std::string DATASET_ID = "2801";
+const std::string FIELD_ID = "681";
 
 /*
  * This is a derived class to quickly test the append_byID functions.
@@ -59,8 +66,8 @@ BOOST_AUTO_TEST_CASE(get_check_user) {
   iSENSE test;
 
   // Add test project
-  test.set_project_ID("929");
-  test.set_project_title("Boost " + test.generate_timestamp());
+  test.set_project_ID(PROJ_ID);
+  test.set_project_title("get check User " + test.generate_timestamp());
 
   // This is a valid email / password - so it should return true.
   BOOST_REQUIRE(test.set_email_password("j@j.j", "j") == true);
@@ -69,10 +76,10 @@ BOOST_AUTO_TEST_CASE(get_check_user) {
 
 // Test the GET project fields method.
 BOOST_AUTO_TEST_CASE(get_project_fields) {
-  iSENSE test_true("929", "test ", "BOOST Test", "123");
+  iSENSE test_true(PROJ_ID, TITLE, LABEL, KEY);
 
   // Make the title unique
-  test_true.set_project_title("Boost " + test_true.generate_timestamp());
+  test_true.set_project_title("get project fields" + test_true.generate_timestamp());
 
   // Test the GET method, should work for this project ID
   BOOST_REQUIRE(test_true.get_project_fields() == true);
@@ -86,10 +93,10 @@ BOOST_AUTO_TEST_CASE(get_project_fields) {
 
 // Test the get_datasets / media objects method
 BOOST_AUTO_TEST_CASE(get_datasets_and_mediaobjects) {
-  iSENSE test_true("929", "test ", "BOOST Test", "123");
+  iSENSE test_true(PROJ_ID, TITLE, LABEL, KEY);
 
   // Make the title unique
-  test_true.set_project_title("Boost " + test_true.generate_timestamp());
+  test_true.set_project_title("get datasets and media objects " + test_true.generate_timestamp());
 
   // Test the GET method, should work for this project ID
   BOOST_REQUIRE(test_true.get_datasets_and_mediaobjects() == true);
@@ -103,9 +110,9 @@ BOOST_AUTO_TEST_CASE(get_datasets_and_mediaobjects) {
 
 // Test the search project method
 BOOST_AUTO_TEST_CASE(get_projects_search) {
-  iSENSE test_true("929", "test ", "BOOST Test", "123");
+  iSENSE test_true(PROJ_ID, TITLE, LABEL, KEY);
 
-  std::string search_term = "hello";
+  std::string search_term = "test";
 
   std::vector<std::string> project_titles;
   project_titles = test_true.get_projects_search(search_term);
@@ -151,7 +158,7 @@ BOOST_AUTO_TEST_CASE(get_dataset_ID) {
   // Try and get dataset ID for the given dataset name.
   std::string datasetID = test_true.get_dataset_ID("MLB Team Statistics 2013");
 
-  BOOST_REQUIRE(datasetID == "1190");
+  BOOST_REQUIRE(datasetID == DATASET_ID);
 
   iSENSE test_false;
 
@@ -187,10 +194,10 @@ BOOST_AUTO_TEST_CASE(get_field_ID) {
 
 // Test POSTing with Contributor keys
 BOOST_AUTO_TEST_CASE(post_JSON_withKey) {
-  iSENSE test("929", "test ", "BOOST Test", "123");
+  iSENSE test(PROJ_ID, TITLE, LABEL, KEY);
 
   // Make the title unique
-  test.set_project_title("Boost " + test.generate_timestamp());
+  test.set_project_title("POST JSON with Keys " + test.generate_timestamp());
 
   // Push some data back
   test.push_back("Timestamp", test.generate_timestamp());
@@ -203,10 +210,10 @@ BOOST_AUTO_TEST_CASE(post_JSON_withKey) {
 
 // Test POSTing with Email/Password
 BOOST_AUTO_TEST_CASE(post_JSON_withEmail) {
-  iSENSE test("929", "test ", "BOOST Test", "123");
+  iSENSE test(PROJ_ID, TITLE, LABEL, KEY);
 
   // Make the title unique + set email/password
-  test.set_project_title("Boost " + test.generate_timestamp());
+  test.set_project_title("POST JSON with Email " + test.generate_timestamp());
   test.set_email_password("j@j.j", "j");
 
   // Push some data back
@@ -225,11 +232,11 @@ BOOST_AUTO_TEST_CASE(append_withDatasetID_byEmail) {
   std::string title, ID, dataset_ID, email, password, letters, num, timestamp;
 
   // This will be a test of the append method.
-  ID = "929";
-  title = "valid";
+  ID = PROJ_ID;
+  title = "Testing";
   email = "j@j.j";
   password = "j";
-  dataset_ID = "7659";
+  dataset_ID = "8715";
 
   // Add project info / dataset info to the object
   test.set_project_ID(ID);
@@ -252,11 +259,11 @@ BOOST_AUTO_TEST_CASE(append_withDatasetName_byEmail) {
   std::string title, ID, dataset_name, email, password, letters, num, timestamp;
 
   // This will be a test of the append method.
-  ID = "929";
-  title = "valid";
+  ID = PROJ_ID;
+  title = "Testing";
   email = "j@j.j";
   password = "j";
-  dataset_name = "testing";
+  dataset_name = "Testing";
 
   // Add project info / dataset info to the object
   test.set_project_ID(ID);
@@ -276,17 +283,17 @@ BOOST_AUTO_TEST_CASE(append_withDatasetName_byEmail) {
 // (Contributor keys)
 BOOST_AUTO_TEST_CASE(append_withDatasetID_byKey) {
   Test test;
-  std::string title, ID, dataset_ID, key, letters, num, timestamp;
+  std::string title, ID, datasetID, key, letters, num, timestamp;
 
   // This will be a test of the append method.
-  title = "this works?";
-  ID = "1029";
-  key = "key";
-  dataset_ID = "7795";
+  title = "Testing";
+  ID = PROJ_ID;
+  key = "123";
+  datasetID = "8715";
 
   // Add project info / dataset info to the object
   test.set_project_ID(ID);
-  test.check_set_dataset_ID(dataset_ID);
+  test.check_set_dataset_ID(datasetID);
   test.set_project_title(title);
   test.set_contributor_key(key);
 
@@ -294,7 +301,7 @@ BOOST_AUTO_TEST_CASE(append_withDatasetID_byKey) {
 
   test.push_back("Number", "999999");
 
-  BOOST_REQUIRE(test.check_append_key_byID(dataset_ID) == true);
+  BOOST_REQUIRE(test.check_append_key_byID(datasetID) == true);
 }
 
 
@@ -305,11 +312,11 @@ BOOST_AUTO_TEST_CASE(append_withDatasetName_byKey) {
   std::string title, ID, dataset_name, label, key;
 
   // This will be a test of the append method.
-  ID = "1029";
+  ID = PROJ_ID;
   title = "test";
   label = "BOOST Test";
-  key = "key";
-  dataset_name = "this works?";
+  key = "123";
+  dataset_name = "Testing";
 
   // Add project info / dataset info to the object
   test.set_project_ID(ID);

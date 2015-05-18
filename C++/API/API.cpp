@@ -129,9 +129,9 @@ void iSENSE::clear_data(void) {
   map_data.clear();   // Clear the map_data
 
   /* Clear the picojson objects:
-   * object: upload_data, fields_data;
-   *  value: get_data, fields;
-   *  array: fields_array;
+   *   object: upload_data, fields_data;
+   *   value: get_data, fields;
+   *   array: fields_array;
    */
 
   // Under the hood picojson::objects are STL maps and
@@ -174,7 +174,7 @@ void iSENSE::push_vector(std::string field_name,
 std::vector<std::string> iSENSE::get_projects_search(std::string search_term) {
 
   std::string get_search = devURL + "/projects?utf8=true&search=" \
-                        + search_term + "&sort=updated_at&order=DESC";
+                         + search_term + "&sort=updated_at&order=DESC";
   // Vector of project titles.
   std::vector<std::string> project_titles;
 
@@ -658,7 +658,7 @@ std::string iSENSE::get_field_ID(std::string field_name) {
     // Print an error and quit, we can't do anything if
     // the field array wasn't set up correctly.
     std::cerr << "\nError in method: get_field_ID()\n";
-    std::cerr << "Field array wasn't set up.";
+    std::cerr << "Field array wasn't set up. \n";
     std::cerr << "Have you pulled the fields off iSENSE?\n";
     return GET_ERROR;
   }
@@ -703,7 +703,6 @@ std::string iSENSE::get_dataset_ID(std::string dataset_name) {
     // Grab the dataset ID and save it in a string
     std::string dataset_ID = obj["id"].to_str();
 
-
     // Grab the dataset name
     std::string name = obj["name"].get<std::string>();
 
@@ -735,14 +734,13 @@ bool iSENSE::post_json_key() {
   // since this is a upload JSON by contributor key.
   int http_code = post_data_function(POST_KEY);
 
-  /*
-  *  The iSENSE API gives us two response codes to check against:
-  *  Success: 200 OK (iSENSE handled the request fine)
-  *  Failure: 401 Unauthorized (email/pw or contributor key was not valid)
-  *  Failure: 422 Unprocessable Entity (email or contributor key was fine,
-  *           but there was an issue with the request's formatting.
-  *           Something in the formatting caused iSENSE to fail.)
-  */
+  /*  The iSENSE API gives us two response codes to check against:
+   *  Success: 200 OK (iSENSE handled the request fine)
+   *  Failure: 401 Unauthorized (email/pw or contributor key was not valid)
+   *  Failure: 422 Unprocessable Entity (email or contributor key was fine,
+   *           but there was an issue with the request's formatting.
+   *           Something in the formatting caused iSENSE to fail.)
+   */
 
   if (http_code == HTTP_AUTHORIZED) {
     std::cout << "\n\nPOST request successfully sent off to iSENSE!\n";
@@ -778,8 +776,7 @@ bool iSENSE::append_key_byID(std::string dataset_ID) {
   // since this is an append by contributor key.
   int http_code = post_data_function(APPEND_KEY);
 
-   /*
-    *  The iSENSE API gives us two response codes to check against:
+   /*  The iSENSE API gives us two response codes to check against:
     *  Success: 200 OK (iSENSE handled the request fine)
     *  Failure: 401 Unauthorized (email/pw or contributor key was not valid)
     *  Failure: 422 Unprocessable Entity (email or contributor key was fine,
@@ -801,12 +798,10 @@ bool iSENSE::append_key_byID(std::string dataset_ID) {
 }
 
 
-/*
- *  Appends to a dataset using its dataset name, which can
+/*  Appends to a dataset using its dataset name, which can
  *  be used to find a dataset ID
  *  We can find the dataset ID by comparing against all the datasets
  *  in a given project until we find the dataset with the given name.
- *
  */
 bool iSENSE::append_key_byName(std::string dataset_name) {
   if(!empty_project_check(APPEND_KEY, "append_key_byName")) {
@@ -847,14 +842,13 @@ bool iSENSE::post_json_email() {
   // since this is upload JSON by email & password.
   int http_code = post_data_function(POST_EMAIL);
 
-  /*
-    *  The iSENSE API gives us two response codes to check against:
-    *  Success: 200 OK (iSENSE handled the request fine)
-    *  Failure: 401 Unauthorized (email or contributor key was not valid)
-    *  Failure: 422 Unprocessable Entity (email or contributor key was fine,
-    *               but there was an issue with the upload for some reason.
-    *               Something in the formatting caused iSENSE to fail.)
-    */
+  /*  The iSENSE API gives us two response codes to check against:
+   *  Success: 200 OK (iSENSE handled the request fine)
+   *  Failure: 401 Unauthorized (email or contributor key was not valid)
+   *  Failure: 422 Unprocessable Entity (email or contributor key was fine,
+   *               but there was an issue with the upload for some reason.
+   *               Something in the formatting caused iSENSE to fail.)
+   */
 
   if (http_code == HTTP_AUTHORIZED) {
     std::cout << "\n\nPOST request successfully sent off to iSENSE!\n";
@@ -935,10 +929,11 @@ bool iSENSE::append_email_byName(std::string dataset_name) {
 }
 
 
-// This function is called by the JSON upload function
-// It formats the upload string
-// Users should not have to call this function - API methods will,
-// and will pass an int value indicating which API method they are using.
+/* This function is called by the JSON upload function
+ * It formats the upload string
+ * Users should not have to call this function - API methods will,
+ * and will pass an int value indicating which API method they are using.
+ */
 void iSENSE::format_upload_string(int post_type) {
   // Add the title + the correct formatting
   upload_data["title"] = value(title);
@@ -1092,10 +1087,8 @@ int iSENSE::post_data_function(int post_type) {
     // It will spit out a ton of information, such as bytes sent off,
     // headers/access/etc. Useful to see if you formatted the data right.
 
-    // *****************
     // Should make a function to turn this off or on
     // or a variable! (bool)
-    // *****************
 
     // curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
@@ -1111,12 +1104,10 @@ int iSENSE::post_data_function(int post_type) {
     curl_easy_cleanup(curl);
     curl_global_cleanup();
 
-    // Return the HTTP code we get from curl.
-    return http_code;
+    return http_code;   // Return the HTTP code we get from curl.
   }
 
-  // If curl fails for some reason, return CURL_ERROR (-1).
-  return CURL_ERROR;
+  return CURL_ERROR;    // If curl fails for some reason, return CURL_ERROR (-1)
 }
 
 
